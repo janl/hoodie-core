@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+console.log("Starting Hoodie:");
+
+// setTimeout(function() {
+//     console.log("  *")
+// }, 1000);
+
+// setTimeout(function() {
+//     console.log("  *")
+// }, 2000);
+
+
+setTimeout(function() {
+var http = require('http');
+    http.createServer(function (req, res) {
+      console.log("%s %s", req.method, req.url);
+      res.writeHead(200, {'Content-Type': 'text/plain'});
+      res.end('Hello Hoodie\n');
+    }).listen(1234, '127.0.0.1');
+
+    var readline = require("readline");
+    var rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    rl.on("SIGINT", function() {
+        rl.close();
+        console.log("Goodbye!");
+        process.exit(0);
+    });
+    rl.question("Launch Hoodie in your browser? (Y/n): ", function(answer) {
+        if(answer != "") {
+            rl.close();
+        } else {
+            // open in browser
+            var spawn = require("child_process").spawn;
+            spawn("open", ["/Applications/Safari.app", "http://127.0.0.1:1234"]);
+        }
+        console.log("\nHoodie Log:")
+    });
+}, 300);
