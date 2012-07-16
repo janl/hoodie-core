@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 console.log("Starting Hoodie:");
 
-// setTimeout(function() {
-//     console.log("  *")
-// }, 1000);
+setTimeout(function() {
+    console.log("  *")
+}, 1000);
 
-// setTimeout(function() {
-//     console.log("  *")
-// }, 2000);
+setTimeout(function() {
+    console.log("  *")
+}, 2000);
 
 
 setTimeout(function() {
@@ -29,13 +29,13 @@ var http = require('http');
         process.exit(0);
     });
     rl.question("Launch Hoodie in your browser? (Y/n): ", function(answer) {
-        if(answer != "") {
-            rl.close();
-        } else {
+        if(answer == "" || answer == "y" || answer == "Y") {
             // open in browser
             var spawn = require("child_process").spawn;
             spawn("open", ["/Applications/Safari.app", "http://127.0.0.1:1234"]);
+        } else {
+            rl.close();
         }
         console.log("\nHoodie Log:")
     });
-}, 300);
+}, 3000);
