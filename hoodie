@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 var cli = require("cli");
-
-cli.enable("daemon");
+var daemon = require("daemonize2");
 
 var commands = {};
 commands.usage = function usage(cmd)
@@ -18,7 +17,27 @@ commands.usage = function usage(cmd)
 commands["service-start"] = function service_start()
 {
     console.log("Starting Hoodie");
+    var service = get_hoodie_service();
+    service.start();
 }
+
+commands["service-stop"] = function service_stop()
+{
+    console.log("Stopping Hoodie");
+    var service = get_hoodie_service();
+    service.stop();
+}
+
+var get_hoodie_service = function get_hoodie_service()
+{
+    return daemon.setup({
+        main: "./bin/hoodie-service.js",
+        name: "service-start.js",
+        pidfile: "/tmp/hoodie-servide.pid"
+    });
+}
+
+// main
 
 cli.main(function(args, options) {
     var cmd = args[0] || "usage";
