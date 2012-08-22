@@ -1,41 +1,30 @@
 #!/usr/bin/env node
-console.log("Starting Hoodie:");
+var cli = require("cli");
 
-setTimeout(function() {
-    console.log("  *")
-}, 1000);
+cli.enable("daemon");
 
-setTimeout(function() {
-    console.log("  *")
-}, 2000);
+var commands = {};
+commands.usage = function usage(cmd)
+{
+    if(cmd !== "usage") {
+        console.log("Unknown command '%s'\n", cmd);
+    }
+    console.log("Usage: hoodie cmd");
+    console.log("cmd is one of:");
+    console.log("  service-start  Starts the Hoodie service");
+    console.log("  usage          Prints this screen")
+}
 
+commands["service-start"] = function service_start()
+{
+    console.log("Starting Hoodie");
+}
 
-setTimeout(function() {
-var http = require('http');
-    http.createServer(function (req, res) {
-      console.log("%s %s", req.method, req.url);
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('Hello Hoodie\n');
-    }).listen(1234, '127.0.0.1');
-
-    var readline = require("readline");
-    var rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-    rl.on("SIGINT", function() {
-        rl.close();
-        console.log("Goodbye!");
-        process.exit(0);
-    });
-    rl.question("Launch Hoodie in your browser? (Y/n): ", function(answer) {
-        if(answer == "" || answer == "y" || answer == "Y") {
-            // open in browser
-            var spawn = require("child_process").spawn;
-            spawn("open", ["/Applications/Safari.app", "http://127.0.0.1:1234"]);
-        } else {
-            rl.close();
-        }
-        console.log("\nHoodie Log:")
-    });
-}, 3000);
+cli.main(function(args, options) {
+    var cmd = args[0] || "usage";
+    if(!commands[cmd]) {
+        commands.usage(cmd);
+        return;
+    }
+    commands[cmd](cmd);
+});
