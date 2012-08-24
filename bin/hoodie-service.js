@@ -16,7 +16,7 @@ app.set("view engine", "html");
 app.set("views", "web/views");
 
 app.get("/", function(req, res) {
-  if(has_apps()) {
+  if(!has_apps()) {
     // var apps = get_app_info(config.apps);
     res.render("list_of_apps.html", {
       apps: "apps"

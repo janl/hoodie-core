@@ -1,49 +1,88 @@
 #!/usr/bin/env node
 var cli = require("cli");
 var daemon = require("daemonize2");
+var HoodieApp = require("./lib/app.js");
 
 var commands = {};
-commands.usage = function usage(cmd)
+commands.usage = function usage(args)
 {
-    if(cmd !== "usage") {
+    if(args[0] !== "usage") {
         console.log("Unknown command '%s'\n", cmd);
     }
     console.log("Usage: hoodie cmd");
     console.log("cmd is one of:");
+    console.log("  start          Starts the Hoodie app in ./");
+    console.log("  start appname  Starts the Hoodie app appname");
     console.log("  service-start  Starts the Hoodie service");
     console.log("  usage          Prints this screen")
-}
+};
 
 commands["service-start"] = function service_start()
 {
     console.log("Starting Hoodie");
     var service = get_hoodie_service();
     service.start();
-}
+};
 
 commands["service-stop"] = function service_stop()
 {
     console.log("Stopping Hoodie");
     var service = get_hoodie_service();
     service.stop();
-}
+};
+
+// start an app
+// in ./ of app: hoodie start
+// anywhere: hoodie start app
+//   looks up 'app' in ~/.hoodie.json
+commands["start"] = function start(args)
+{
+    var app_name = app_name_from_args(args);
+    var app = new HoodieApp(app_name);
+    app.start();
+};
+
+// stop an app
+// in ./ of app: hoodie stop
+// anywhere: hoodie stop app
+//   looks up 'app' in ~/.hoodie.json
+commands["stop"] = function stop(args)
+{
+    var app_name = app_name_from_args(args);
+    var app = new HoodieApp(app_name);
+    app.stop();
+};
+
+var app_name_from_args = function app_name_from_args(args)
+{
+    var app_name;
+    if(args.length == 0) {
+        // read "app" from CWD/package.json:name when type: "hoodie-app"
+        app_name = JSON.parse(fs.readFileSync("package.json")).name;
+    } else {
+        // args[0] is name
+        app_name = args[0];
+    }
+    return app_name;
+};
 
 var get_hoodie_service = function get_hoodie_service()
 {
     return daemon.setup({
         main: "./bin/hoodie-service.js",
         name: "service-start.js",
-        pidfile: "/tmp/hoodie-servide.pid"
+        pidfile: "/tmp/hoodie-service.pid"
     });
-}
+};
+
 
 // main
 
 cli.main(function(args, options) {
     var cmd = args[0] || "usage";
     if(!commands[cmd]) {
-        commands.usage(cmd);
+        commands.usage(["usage"]);
         return;
     }
-    commands[cmd](cmd);
+    commands[cmd](args.slice(1));
 });
