@@ -12,10 +12,11 @@ commands.usage = function usage(args)
     }
     console.log("Usage: hoodie cmd");
     console.log("cmd is one of:");
+    console.log("  new appname    Creates new Hoodie app in ./appname");
     console.log("  start          Starts the Hoodie app in ./");
     console.log("  start appname  Starts the Hoodie app appname");
     console.log("  service-start  Starts the Hoodie service");
-    console.log("  usage          Prints this screen")
+    console.log("  usage          Prints this screen");
 };
 
 commands["service-start"] = function service_start()
@@ -30,6 +31,22 @@ commands["service-stop"] = function service_stop()
     console.log("Stopping Hoodie");
     var service = get_hoodie_service();
     service.stop();
+};
+
+// Create a new app
+
+commands["new"] = function hoodie_new(args)
+{
+    if(!args[0]) {
+        console.log("Missing appname: hoodie new appname");
+        return;
+    }
+    var name = args[0];
+    console.log("Creating new Hoodie app '" + name + "'");
+
+    // create app
+
+    // add app config to ~/.hoodie.json
 };
 
 // start an app
