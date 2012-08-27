@@ -3,6 +3,8 @@ var express = require("express");
 var fs = require("fs");
 var cons = require("consolidate");
 var Config = require("../lib/config");
+var watch = require('watchfd').watch;
+var http_proxy = require("http-proxy");
 
 
 var app = express();
@@ -29,7 +31,17 @@ app.get("/", function(req, res) {
 });
 
 start_dns();
-start_httpd();
+var httpd = start_httpd();
+watch("/Users/jan/.hoodie.json", function(current, previous) {
+  if(current.size == previous.size) { // make content-based
+    return;
+  }
+  console.log("reloading hoodie proxy");
+  httpd.close(function() {
+
+    httpd = start_httpd();
+  })
+});
 
 app.listen(1235);
 console.log("Listening on port 1235");
@@ -53,12 +65,13 @@ function start_httpd()
     }
     return routes;
   }
-  var http_proxy = require("http-proxy");
   var routes = make_routes();
   var server = http_proxy.createServer({
     router: routes
   });
   server.listen(5999);
+  console.log("httpd running");
+  return server;
 }
 
 function start_dns()
@@ -90,9 +103,7 @@ function start_dns()
     throw e;
   });
   server.bind(3333, "127.0.0.1");
-  console.log(server);
   console.log("DNS is a go");
-
 }
 
 function read_config(defaults)
