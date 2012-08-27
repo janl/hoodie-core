@@ -2,6 +2,8 @@
 var express = require("express");
 var fs = require("fs");
 var cons = require("consolidate");
+var Config = require("../lib/config");
+
 
 var app = express();
 
@@ -27,12 +29,37 @@ app.get("/", function(req, res) {
 });
 
 start_dns();
+start_httpd();
 
 app.listen(1235);
 console.log("Listening on port 1235");
 
 
 // util
+
+function start_httpd()
+{
+  function make_routes()
+  {
+    // {
+    //   "app.hoodie.local": "127.0.0.1:8000",
+    //   "foo.hoodie.local": "127.0.0.1:8100"
+    // }
+    var routes = {};
+    var cfg = new Config();
+    var apps = cfg.get_apps();
+    for(var app in apps) {
+      routes[app + ".hoodie.local"] = "127.0.0.1:" + apps[app].port;
+    }
+    return routes;
+  }
+  var http_proxy = require("http-proxy");
+  var routes = make_routes();
+  var server = http_proxy.createServer({
+    router: routes
+  });
+  server.listen(5999);
+}
 
 function start_dns()
 {
@@ -42,7 +69,7 @@ function start_dns()
   var server = dnsserver.createServer();
 
   server.on("request", function(req, res) {
-    console.log("req = ", req);
+    // console.log("req = ", req);
     var question = req.question;
 
     if (question.type == 1 && question.class == 1) {
@@ -56,7 +83,7 @@ function start_dns()
   });
 
   server.on("message", function(m) {
-    console.log(m);
+    // console.log(m);
   });
 
   server.on("error", function(e) {

@@ -58,6 +58,18 @@ commands["new"] = function hoodie_new(args)
             path: process.cwd() + "/" + name,
             port: config.get_max_port() + 100 // running out of ports
         });
+        // create /etc/resolver/#{name}.hoodie.local
+        var contents = [
+            "nameserver 127.0.0.1",
+            "port 3333"
+        ].join("\n");
+        fs.writeFileSync("/tmp/hoodie-resolver.tmp", contents);
+        exec("sudo cp /tmp/hoodie-resolver.tmp /etc/resolver/" + name + ".hoodie.local");
+
+        // relaunch hoodie-service (or update routing proxy)
+        commands["service-stop"]();
+        commands["service-start"]();
+
         console.log("All done.");
         console.log("Use hoodie start " + name + " to start the new app");
     });
