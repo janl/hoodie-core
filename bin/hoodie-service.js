@@ -26,11 +26,47 @@ app.get("/", function(req, res) {
   }
 });
 
+start_dns();
+
 app.listen(1235);
 console.log("Listening on port 1235");
 
 
 // util
+
+function start_dns()
+{
+  console.log("starting dns");
+  var dnsserver = require("dnsserver");
+
+  var server = dnsserver.createServer();
+
+  server.on("request", function(req, res) {
+    console.log("req = ", req);
+    var question = req.question;
+
+    if (question.type == 1 && question.class == 1) {
+      // IN A query
+      res.addRR(question.name, 1, 1, 3600, "127.0.0.1");
+    } else {
+      res.header.rcode = 3; // NXDOMAIN
+    }
+
+    res.send();
+  });
+
+  server.on("message", function(m) {
+    console.log(m);
+  });
+
+  server.on("error", function(e) {
+    throw e;
+  });
+  server.bind(3333, "127.0.0.1");
+  console.log(server);
+  console.log("DNS is a go");
+
+}
 
 function read_config(defaults)
 {
