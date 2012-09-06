@@ -109,7 +109,7 @@ function start_dns()
 function read_config(defaults)
 {
   try {
-    var config = JSON.parse(fs.readFileSync("/Users/jan/.hoodie.json"));
+    var config = JSON.parse(fs.readFileSync(process.env["HOME"] + "/.hoodie.json"));
     for(var name in defaults) {
       if(!config[name]) {
         config[name] = defaults[name];
