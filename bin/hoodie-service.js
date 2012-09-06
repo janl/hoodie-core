@@ -33,7 +33,7 @@ app.get("/", function(req, res) {
 start_dns();
 var httpd = start_httpd();
 watch("/Users/jan/.hoodie.json", function(current, previous) {
-  if(current.size == previous.size) { // make content-based
+  if(current.mtime.getTime() <= previous.mtime.getTime()) { // make content-based
     return;
   }
   console.log("reloading hoodie proxy");
