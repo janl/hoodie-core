@@ -44,10 +44,19 @@ commands["new"] = function hoodie_new(args)
         return;
     }
     var name = args[0];
+
+    // got root?
+    if(process.getuid() !== 0) {
+        console.log("Please use: 'sudo hoodie new " + name + "'");
+        console.log("We hope to remove the sudo requirement in the future. Sorry about that!");
+        return;
+    }
+
     console.log("Creating new Hoodie app '" + name + "'");
 
     // create app
-    var cmd = "git clone https://github.com/hoodiehq/hoodie-app-skeleton.git " + name;
+    var sudo_user = process.env["SUDO_USER"];
+    var cmd = "sudo -u " + sudo_user +" git clone https://github.com/hoodiehq/hoodie-app-skeleton.git " + name;
     exec(cmd, function(error, stdout, stderr) {
         if(error) {
             throw(error);
@@ -64,11 +73,11 @@ commands["new"] = function hoodie_new(args)
             "port 3333"
         ].join("\n");
         fs.writeFileSync("/tmp/hoodie-resolver.tmp", contents);
-        exec("sudo cp /tmp/hoodie-resolver.tmp /etc/resolver/" + name + ".hoodie.local");
+        exec("cp /tmp/hoodie-resolver.tmp /etc/resolver/" + name + ".hoodie.local");
 
-        // relaunch hoodie-service (or update routing proxy)
-        commands["service-stop"]();
-        commands["service-start"]();
+        // update routing proxy by touching ~/.hoodie.json
+        var newDate = new Date();
+        fs.utimesSync(process.env["HOME"] + "/.hoodie.json", newDate, newDate);
 
         console.log("All done.");
         console.log("Use hoodie start " + name + " to start the new app");
