@@ -79,8 +79,13 @@ commands["new"] = function hoodie_new(args)
         var newDate = new Date();
         fs.utimesSync(process.env["HOME"] + "/.hoodie.json", newDate, newDate);
 
-        console.log("All done.");
-        console.log("Use hoodie start " + name + " to start the new app");
+        console.log("Firewallin’");
+        var cmd = "sudo launchctl load -Fw " + __dirname + "/etc/ie.hood.firewall.plist"
+        exec(cmd, function(error, stdout, stderr) {
+            if(error) { throw error };
+            console.log("All done.");
+            console.log("Use hoodie start " + name + " to start the new app");
+        });
     });
 };
 
