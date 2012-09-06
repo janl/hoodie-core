@@ -9,7 +9,7 @@ var Config = require("./lib/config.js");
 var commands = {};
 commands.usage = function usage(args)
 {
-    if(args[0] !== "usage") {
+    if(args[0] && args[0] !== "usage") {
         console.log("Unknown command '%s'\n", cmd);
     }
     console.log("Usage: hoodie cmd");
@@ -90,6 +90,7 @@ commands["new"] = function hoodie_new(args)
 //   looks up 'app' in ~/.hoodie.json
 commands["start"] = function start(args)
 {
+    commands["service-start"]();
     var app_name = app_name_from_args(args);
     var app = new HoodieApp(app_name);
     app.start();
