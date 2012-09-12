@@ -32,7 +32,7 @@ Installs node, npm & CouchDB
 This command creates a new hoodie applicate with the name `whiskie`. It creates a new directory `whiskie` in the current directory and sets up everything you need to develop and run your app.
 
 
-## Architectre
+## Architecture
 
 This section explains what goes on behind the scenes when you install hoodie, or create new applications.
 
