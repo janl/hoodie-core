@@ -10,19 +10,45 @@ var HoodieApp = require("./lib/app.js");
 var Config = require("./lib/config.js");
 
 var commands = {};
-commands.usage = function usage(args)
+commands["usage"] = function usage(args)
 {
     if(args[0] && args[0] !== "usage") {
         console.log("Unknown command '%s'\n", cmd);
     }
     console.log("Usage: hoodie cmd");
     console.log("cmd is one of:");
+    console.log("  setup          This needs to be run once, before everything else");
     console.log("  new appname    Creates new Hoodie app in ./appname");
     console.log("  start          Starts the Hoodie app in ./");
     console.log("  start appname  Starts the Hoodie app appname");
     console.log("  service-start  Starts the Hoodie service");
     console.log("  usage          Prints this screen");
 };
+
+commans["setup"] = function setup(args)
+{
+    // got root?
+    if(process.getuid() !== 0) {
+        console.log("Please use: 'sudo hoodie setup'");
+        console.log("We hope to remove the sudo requirement in the future. Sorry about that!");
+        return;
+    }
+
+    // create /etc/resolver/#{name}.hoodie.dev
+    console.log("DNS’in.");
+    var contents = [
+        "nameserver 127.0.0.1",
+        "port 3333"
+    ].join("\n");
+    fs.writeFileSync("/tmp/hoodie-resolver.tmp", contents);
+    exec("cp /tmp/hoodie-resolver.tmp /etc/resolver/hoodie.dev");
+    console.log("Firewallin’.");
+    var cmd = "sudo launchctl load -Fw " + __dirname + "/etc/ie.hood.firewall.plist"
+    exec(cmd, function(error, stdout, stderr) {
+        if(error) { throw error };
+    });
+};
+
 
 commands["service-start"] = function service_start()
 {
@@ -48,18 +74,10 @@ commands["new"] = function hoodie_new(args)
     }
     var name = args[0];
 
-    // got root?
-    if(process.getuid() !== 0) {
-        console.log("Please use: 'sudo hoodie new " + name + "'");
-        console.log("We hope to remove the sudo requirement in the future. Sorry about that!");
-        return;
-    }
-
     console.log("Creating new Hoodie app '" + name + "'");
 
     // create app
-    var sudo_user = process.env["SUDO_USER"];
-    var cmd = "sudo -u " + sudo_user +" git clone https://github.com/hoodiehq/hoodie-app-skeleton.git " + name;
+    var cmd = "git clone https://github.com/hoodiehq/hoodie-app-skeleton.git " + name;
     exec(cmd, function(error, stdout, stderr) {
         if(error) {
             throw(error);
@@ -68,7 +86,7 @@ commands["new"] = function hoodie_new(args)
         // Customise app
         var customisation = {
             hoodie_appname: name,
-            hoodie_api_url: "http://api." + name + ".hoodie.local"
+            hoodie_api_url: "http://api." + name + ".hoodie.dev"
         };
 
         var template_files = ["/www/index.html", "/package.json"];
@@ -94,25 +112,12 @@ commands["new"] = function hoodie_new(args)
             throw(e);
         }
 
-        // create /etc/resolver/#{name}.hoodie.local
-        var contents = [
-            "nameserver 127.0.0.1",
-            "port 3333"
-        ].join("\n");
-        fs.writeFileSync("/tmp/hoodie-resolver.tmp", contents);
-        exec("cp /tmp/hoodie-resolver.tmp /etc/resolver/" + name + ".hoodie.local");
-
         // update routing proxy by touching ~/.hoodie.json
         var newDate = new Date();
         fs.utimesSync(process.env["HOME"] + "/.hoodie.json", newDate, newDate);
 
-        console.log("Firewallin’");
-        var cmd = "sudo launchctl load -Fw " + __dirname + "/etc/ie.hood.firewall.plist"
-        exec(cmd, function(error, stdout, stderr) {
-            if(error) { throw error };
-            console.log("All done.");
-            console.log("Use hoodie start " + name + " to start the new app");
-        });
+        console.log("All done.");
+        console.log("Use hoodie start " + name + " to start the new app");
     });
 };
 
