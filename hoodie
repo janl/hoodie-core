@@ -3,6 +3,9 @@ var fs = require("fs");
 var cli = require("cli");
 var daemon = require("daemonize2");
 var exec = require("child_process").exec;
+
+require("shelljs/global"); // GIMMEH!
+
 var HoodieApp = require("./lib/app.js");
 var Config = require("./lib/config.js");
 
@@ -61,12 +64,36 @@ commands["new"] = function hoodie_new(args)
         if(error) {
             throw(error);
         }
-        // add app config to ~/.hoodie.json
-        var config = new Config();
-        config.add_app(name, {
-            path: process.cwd() + "/" + name,
-            port: config.get_max_port() + 100 // running out of ports
+
+        // Customise app
+        var customisation = {
+            hoodie_appname: name,
+            hoodie_api_url: "http://api." + name + ".hoodie.local"
+        };
+
+        find("./" + name).filter(function(file) {
+            if(file.match(/\.git/)) { return false; }
+            return test("-f", file);
+        }).forEach(function(file) {
+            console.log("replacing values in '%s'", file);
+            for(var placeholder in customisation) {
+                var replacement = customisation[placeholder];
+                sed("-i", "{{" + placeholder + "}}", replacement, file);
+            }
         });
+
+        try {
+            // add app config to ~/.hoodie.json
+            var config = new Config();
+            config.add_app(name, {
+                path: process.cwd() + "/" + name,
+                port: config.get_max_port() + 100 // running out of ports
+            });
+        } catch(e) {
+            // rm ./appname
+            throw(e);
+        }
+
         // create /etc/resolver/#{name}.hoodie.local
         var contents = [
             "nameserver 127.0.0.1",
