@@ -25,7 +25,7 @@ commands["usage"] = function usage(args)
     console.log("  usage          Prints this screen");
 };
 
-commans["setup"] = function setup(args)
+commands["setup"] = function setup(args)
 {
     // got root?
     if(process.getuid() !== 0) {
@@ -43,9 +43,12 @@ commans["setup"] = function setup(args)
     fs.writeFileSync("/tmp/hoodie-resolver.tmp", contents);
     exec("cp /tmp/hoodie-resolver.tmp /etc/resolver/hoodie.dev");
     console.log("Firewallin’.");
-    var cmd = "sudo launchctl load -Fw " + __dirname + "/etc/ie.hood.firewall.plist"
+    var cmd = "launchctl load -Fw " + __dirname + "/etc/ie.hood.firewall.plist"
     exec(cmd, function(error, stdout, stderr) {
         if(error) { throw error };
+        console.log("Setup done, thanks for your patience!");
+        console.log("What do you want to do next?");
+        commands["usage"]();
     });
 };
 
