@@ -46,7 +46,7 @@ watch("/Users/jan/.hoodie.json", function(current, previous) {
   httpd.close(function() {
 
     httpd = start_httpd();
-  })
+  });
 });
 
 
