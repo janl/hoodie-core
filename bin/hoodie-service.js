@@ -20,10 +20,11 @@ log("Starting Hoodie Service");
 
 app.engine("html", cons.hogan);
 app.set("view engine", "html");
-app.set("views", "web/views");
+app.set("views", __dirname + "/../web/views");
+log(__dirname + "/../web/views");
 
 app.get("/", function(req, res) {
-  if(!has_apps()) {
+  if(has_apps()) {
     // var apps = get_app_info(config.apps);
     res.render("list_of_apps.html", {
       apps: "apps"
@@ -64,6 +65,7 @@ function start_httpd()
     //   "api.foo.hoodie.local": "127.0.0.1:8101",
     // }
     var routes = {};
+    routes["hoodie.local"] = "127.0.0.1:1235";
     var cfg = new Config();
     var apps = cfg.get_apps();
     for(var app in apps) {
@@ -95,7 +97,7 @@ function start_dns()
 
     if (question.type == 1 && question.class == 1) {
       // IN A query
-      res.addRR(question.name, 1, 1, 3600, "127.0.0.1");
+      res.addRR(question.name, 1, 1, 600, "127.0.0.1");
     } else {
       res.header.rcode = 3; // NXDOMAIN
     }
