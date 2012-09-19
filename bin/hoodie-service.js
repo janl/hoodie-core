@@ -2,9 +2,12 @@
 var express = require("express");
 var fs = require("fs");
 var cons = require("consolidate");
-var Config = require("../lib/config");
 var watch = require('watchfd').watch;
+
 var http_proxy = require("http-proxy");
+var Config = require("../lib/config");
+
+var log = require("../lib/util").log;
 
 
 var app = express();
@@ -13,7 +16,7 @@ var config = read_config({
   apps: {}
 });
 
-console.log("Configuration: %j", config);
+log("Starting Hoodie Service");
 
 app.engine("html", cons.hogan);
 app.set("view engine", "html");
@@ -30,21 +33,22 @@ app.get("/", function(req, res) {
   }
 });
 
+app.listen(1235);
+log("Listening on port 1235");
+
 start_dns();
 var httpd = start_httpd();
 watch("/Users/jan/.hoodie.json", function(current, previous) {
   if(current.mtime.getTime() <= previous.mtime.getTime()) { // make content-based
     return;
   }
-  console.log("reloading hoodie proxy");
+  log("reloading hoodie proxy");
   httpd.close(function() {
 
     httpd = start_httpd();
   })
 });
 
-app.listen(1235);
-console.log("Listening on port 1235");
 
 
 // util
@@ -55,13 +59,16 @@ function start_httpd()
   {
     // {
     //   "app.hoodie.local": "127.0.0.1:8000",
-    //   "foo.hoodie.local": "127.0.0.1:8100"
+    //   "api.app.hoodie.local": "127.0.0.1:8001",
+    //   "foo.hoodie.local": "127.0.0.1:8100",
+    //   "api.foo.hoodie.local": "127.0.0.1:8101",
     // }
     var routes = {};
     var cfg = new Config();
     var apps = cfg.get_apps();
     for(var app in apps) {
       routes[app + ".hoodie.local"] = "127.0.0.1:" + apps[app].port;
+      routes["api." + app + ".hoodie.local"] = "127.0.0.1:" + apps[app].port + 1;
     }
     return routes;
   }
@@ -70,19 +77,18 @@ function start_httpd()
     router: routes
   });
   server.listen(5999);
-  console.log("httpd running");
+  log("httpd running");
   return server;
 }
 
 function start_dns()
 {
-  console.log("starting dns");
+  log("starting dns");
   var dnsserver = require("dnsserver");
 
   var server = dnsserver.createServer();
 
   server.on("request", function(req, res) {
-    // console.log("req = ", req);
     var question = req.question;
 
     if (question.type == 1 && question.class == 1) {
@@ -96,14 +102,14 @@ function start_dns()
   });
 
   server.on("message", function(m) {
-    // console.log(m);
+    // log(m);
   });
 
   server.on("error", function(e) {
-    throw e;
+    log(e);
   });
   server.bind(3333, "127.0.0.1");
-  console.log("DNS is a go");
+  log("DNS is a go");
 }
 
 function read_config(defaults)
@@ -117,13 +123,12 @@ function read_config(defaults)
     }
     return config;
  } catch(e) {
-  console.log(e);
+  log(e);
   return defaults;
  }
 }
 
 function has_apps()
 {
-  console.log(JSON.stringify(config.apps));
   return JSON.stringify(config.apps) !== "{}";
 }
