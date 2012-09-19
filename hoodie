@@ -161,7 +161,6 @@ var get_hoodie_service = function get_hoodie_service()
     });
 };
 
-
 // main
 
 cli.main(function(args, options) {
