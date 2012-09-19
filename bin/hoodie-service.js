@@ -68,8 +68,10 @@ function start_httpd()
     var apps = cfg.get_apps();
     for(var app in apps) {
       routes[app + ".hoodie.local"] = "127.0.0.1:" + apps[app].port;
-      routes["api." + app + ".hoodie.local"] = "127.0.0.1:" + apps[app].port + 1;
+      routes["api." + app + ".hoodie.local"] = "127.0.0.1:" + (apps[app].port + 1)
+        + "/127.0.0.1:" + (apps[app].port + 2);
     }
+    // log(routes);
     return routes;
   }
   var routes = make_routes();
