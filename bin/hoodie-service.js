@@ -59,18 +59,18 @@ function start_httpd()
   function make_routes()
   {
     // {
-    //   "app.hoodie.local": "127.0.0.1:8000",
-    //   "api.app.hoodie.local": "127.0.0.1:8001",
-    //   "foo.hoodie.local": "127.0.0.1:8100",
-    //   "api.foo.hoodie.local": "127.0.0.1:8101",
+    //   "app.hoodie.dev": "127.0.0.1:8000",
+    //   "api.app.hoodie.dev": "127.0.0.1:8001",
+    //   "foo.hoodie.dev": "127.0.0.1:8100",
+    //   "api.foo.hoodie.dev": "127.0.0.1:8101",
     // }
     var routes = {};
-    routes["hoodie.local"] = "127.0.0.1:1235";
+    routes["hoodie.dev"] = "127.0.0.1:1235";
     var cfg = new Config();
     var apps = cfg.get_apps();
     for(var app in apps) {
-      routes[app + ".hoodie.local"] = "127.0.0.1:" + apps[app].port;
-      routes["api." + app + ".hoodie.local"] = "127.0.0.1:" + (apps[app].port + 1)
+      routes[app + ".hoodie.dev"] = "127.0.0.1:" + apps[app].port;
+      routes["api." + app + ".hoodie.dev"] = "127.0.0.1:" + (apps[app].port + 1)
         + "/127.0.0.1:" + (apps[app].port + 2);
     }
     // log(routes);

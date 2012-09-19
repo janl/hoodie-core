@@ -12,7 +12,7 @@ var Config = require("./lib/config.js");
 var commands = {};
 commands["usage"] = function usage(args)
 {
-    if(args[0] && args[0] !== "usage") {
+    if(args && args[0] && args[0] !== "usage") {
         console.log("Unknown command '%s'\n", cmd);
     }
     console.log("Usage: hoodie cmd");
