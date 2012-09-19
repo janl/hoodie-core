@@ -71,14 +71,14 @@ commands["new"] = function hoodie_new(args)
             hoodie_api_url: "http://api." + name + ".hoodie.local"
         };
 
-        find("./" + name).filter(function(file) {
-            if(file.match(/\.git/)) { return false; }
-            return test("-f", file);
-        }).forEach(function(file) {
+        var template_files = ["/www/index.html", "/package.json"];
+        template_files.forEach(function(file) {
+            file = name + file;
             console.log("replacing values in '%s'", file);
             for(var placeholder in customisation) {
                 var replacement = customisation[placeholder];
-                sed("-i", "{{" + placeholder + "}}", replacement, file);
+                var matcher = new RegExp("{{" + placeholder + "}}", "g");
+                sed("-i", matcher, replacement, file);
             }
         });
 
