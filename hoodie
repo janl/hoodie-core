@@ -22,6 +22,7 @@ commands["usage"] = function usage(args)
     console.log("  start          Starts the Hoodie app in ./");
     console.log("  start appname  Starts the Hoodie app appname");
     console.log("  service-start  Starts the Hoodie service");
+    console.log("  apps           Shows a list of all installed apps");
     console.log("  usage          Prints this screen");
 };
 
@@ -162,6 +163,22 @@ commands["stop"] = function stop(args)
     var app = new HoodieApp(app_name);
     app.stop();
 };
+
+// list all apps
+commands["apps"] = function apps()
+{
+    var config = new Config();
+    var apps = config.get_apps();
+    console.log("");
+    for(var name in apps) {
+        var app = apps[name];
+        console.log("%s:", name);
+        console.log("  http://%s.hoodie.dev", name);
+        console.log("  %s", app.path);
+        console.log("");
+    }
+}
+
 
 var app_name_from_args = function app_name_from_args(args)
 {
