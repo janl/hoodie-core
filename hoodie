@@ -53,8 +53,8 @@ commands["setup"] = function setup(args)
         console.log("What do you want to do next?");
         console.log("Type 'hoodie' for options.");
     });
-    // create var log hoodie, make group writeable
 
+    // create var log hoodie, make group writeable
     var varloghoodie = "/var/log/hoodie";
     mkdir("-p", varloghoodie);
     chgrp("admin", varloghoodie);
