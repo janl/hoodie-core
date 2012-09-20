@@ -9,15 +9,16 @@ var Config = require("../lib/config");
 
 var log = require("../lib/util").log;
 
-
-var app = express();
+log("Starting Hoodie Service");
 
 var config = read_config({
   apps: {}
 });
 
-log("Starting Hoodie Service");
 
+
+// start admin app
+var app = express();
 app.engine("html", cons.hogan);
 app.set("view engine", "html");
 app.set("views", __dirname + "/../web/views");
@@ -36,6 +37,10 @@ app.get("/", function(req, res) {
 
 app.listen(1235);
 log("Listening on port 1235");
+
+
+
+
 
 start_dns();
 var httpd = start_httpd();
