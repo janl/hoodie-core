@@ -41,7 +41,10 @@ commands["setup"] = function setup(args)
         "port 3333"
     ].join("\n");
     fs.writeFileSync("/tmp/hoodie-resolver.tmp", contents);
+    // mkdir -p /etc/resolver
+    mkdir("-p", "/etc/resolver");
     exec("cp /tmp/hoodie-resolver.tmp /etc/resolver/hoodie.dev");
+
     console.log("Firewallin’.");
     var cmd = "launchctl load -Fw " + __dirname + "/etc/ie.hood.firewall.plist"
     exec(cmd, function(error, stdout, stderr) {
@@ -50,6 +53,12 @@ commands["setup"] = function setup(args)
         console.log("What do you want to do next?");
         console.log("Type 'hoodie' for options.");
     });
+    // create var log hoodie, make group writeable
+
+    var varloghoodie = "/var/log/hoodie";
+    mkdir("-p", varloghoodie);
+    chgrp("admin", varloghoodie);
+    chmod("g+w", varloghoodie);
 };
 
 
