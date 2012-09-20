@@ -144,6 +144,30 @@ commands["new"] = function hoodie_new(args)
     });
 };
 
+commands["delete"] = function _delete(args)
+{
+    var app_name = app_name_from_args(args); // TODO: handle nonexist
+    var app = new HoodieApp(app_name);
+    // bail if app runs
+    if(app.is_running()) {
+        console.log("App '%s' is running, can’t delete.", app_name);
+        return;
+    }
+    // rm -rf path
+    rm("-rf", app.get_path());
+
+    // config unset
+    var config = new Config();
+    config.delete_app(app_name);
+}
+
+commands["status"] = function status(args)
+{
+    var app_name = app_name_from_args(args);
+    var app = new HoodieApp(app_name);
+    console.log("%j", app.status());
+}
+
 // start an app
 // in ./ of app: hoodie start
 // anywhere: hoodie start app
