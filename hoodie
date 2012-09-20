@@ -48,7 +48,7 @@ commands["setup"] = function setup(args)
         if(error) { throw error };
         console.log("Setup done, thanks for your patience!");
         console.log("What do you want to do next?");
-        commands["usage"]();
+        console.log("Type 'hoodie' for options.");
     });
 };
 
