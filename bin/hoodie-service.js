@@ -17,30 +17,7 @@ var config = read_config({
 
 
 
-// start admin app
-var app = express();
-app.engine("html", cons.hogan);
-app.set("view engine", "html");
-app.set("views", __dirname + "/../web/views");
-log(__dirname + "/../web/views");
-
-app.get("/", function(req, res) {
-  if(has_apps()) {
-    // var apps = get_app_info(config.apps);
-    res.render("list_of_apps.html", {
-      apps: "apps"
-    });
-  } else {
-    res.render("first_run.html");
-  }
-});
-
-app.listen(1235);
-log("Listening on port 1235");
-
-
-
-
+// start admin app, second try
 
 start_dns();
 var httpd = start_httpd();
@@ -64,13 +41,16 @@ function start_httpd()
   function make_routes()
   {
     // {
+    //   "hoodie.dev": "127.0.0.1:1050"
+    //   "api.hoodie.dev": "127.0.0.1:1051"
     //   "app.hoodie.dev": "127.0.0.1:8000",
     //   "api.app.hoodie.dev": "127.0.0.1:8001",
     //   "foo.hoodie.dev": "127.0.0.1:8100",
     //   "api.foo.hoodie.dev": "127.0.0.1:8101",
     // }
     var routes = {};
-    routes["hoodie.dev"] = "127.0.0.1:1235";
+    routes["hoodie.dev"] = "127.0.0.1:1050";
+    routes["api.hoodie.dev"] = "127.0.0.1:1051";
     var cfg = new Config();
     var apps = cfg.get_apps();
     for(var app in apps) {

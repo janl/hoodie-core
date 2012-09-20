@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <title>web</title>
+  <script type="text/javascript" src="/script/jquery-1.7.2.min.js"></script>
+  <script type="text/javascript" src="/script/hoodie.js"></script>
+  <script type="text/javascript">
+  var hoodie = new Hoodie("http://api.web.hoodie.dev");
+  console.log("hello hoodie");
+  console.log(hoodie);
+  hoodie.request("GET", "/")
+  .done(function(data) {
+    console.log(data);
+  })
+  .fail(function(error) {
+    console.log(error);
+  });
+  </script>
+  <link rel="stylesheet" href="styles/main.css"/>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">
+      <img src="images/hoodie_logo.png" alt="">
+    </div>
+  </div>
+  <div class="main welcome">
+    <div class="header">
+      <h1 class="title">web</h1>
+    </div>
+    <div class="body">
+      <h2>Welcome!</h2>
+      <p>Your Hoodie-app <strong>web</strong> is ready!</p>
+      <p>You can find <strong>web</strong>'s admin panel at <br><a href="">http://admin.web.hoodie.dev</a></p>
+      <a href="http://admin.web.hoodie.dev" class="button"><i class="icon-cog"></i>Open web's admin panel</a>
+    </div>
+  </div>
+</body>
+</html>
