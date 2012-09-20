@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-var express = require("express");
 var fs = require("fs");
 var cons = require("consolidate");
 var watch = require('watchfd').watch;
