@@ -32,10 +32,8 @@ commands["usage"] = function usage(args)
     console.log("  service restart  Restarts the Hoodie service");
     console.log("  service stop     Stops the Hoodie service");
     console.log("");
-    console.log("  worker new name        Create new worker `name`");
-    console.log("  worker delete name     Delete worker `name`");
-    console.log("  worker show-installed  Show all installed workers");
-    console.log("  worker show-available  Show all available workers");
+    console.log("  worker install name        Create new worker `name`");
+    console.log("  worker uninstall name     Delete worker `name`");
     console.log("");
     console.log("  usage  Prints this screen");
 };
