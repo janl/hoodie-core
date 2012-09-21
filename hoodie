@@ -75,14 +75,12 @@ commands["delete"] = function _delete(args)
 {
     var name = app_name_from_args(args); // TODO: handle nonexist
     var app = new HoodieApp(name);
-
     hoodie.delete_app(app);
 };
 
 commands["status"] = function status(args)
 {
     var app_name = app_name_from_args(args);
-
     var app = new HoodieApp(app_name);
     console.log("%j", app.status());
 }
@@ -132,6 +130,9 @@ commands["open"] = function open(args)
   exec(util.format("open http://%s.hoodie.dev", app_name));
 };
 
+
+// util
+
 var app_name_from_args = function app_name_from_args(args)
 {
     var app_name;
@@ -144,7 +145,6 @@ var app_name_from_args = function app_name_from_args(args)
     }
     return app_name;
 };
-
 
 // main
 
