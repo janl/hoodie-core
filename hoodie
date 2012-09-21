@@ -9,6 +9,7 @@ require("shelljs/global"); // GIMMEH!
 
 var HoodieApp = require("./lib/app.js");
 var Config = require("./lib/config.js");
+var hoodie = require("./lib/hoodie.js");
 
 var commands = {};
 commands["usage"] = function usage(args)
@@ -29,53 +30,17 @@ commands["usage"] = function usage(args)
     console.log("  usage          Prints this screen");
 };
 
-commands["setup"] = function setup(args)
+commands["setup"] = function setup()
 {
-    // got root?
-    if(process.getuid() !== 0) {
-        console.log("Please use: 'sudo hoodie setup'");
-        console.log("We hope to remove the sudo requirement in the future. Sorry about that!");
-        return;
-    }
-    try {
-        // create /etc/resolver/#{name}.hoodie.dev
-        console.log("DNS’in.");
-        var contents = [
-            "nameserver 127.0.0.1",
-            "port 3333"
-        ].join("\n");
-        fs.writeFileSync("/tmp/hoodie-resolver.tmp", contents);
-        // mkdir -p /etc/resolver
-        mkdir("-p", "/etc/resolver");
-        exec("cp /tmp/hoodie-resolver.tmp /etc/resolver/hoodie.dev");
-
-        console.log("Firewallin’.");
-        var cmd = "launchctl load -Fw " + __dirname + "/etc/ie.hood.firewall.plist"
-        exec(cmd, function(error, stdout, stderr) {
-            if(error) { throw error };
-            console.log("Setup done, thanks for your patience!");
-            console.log("What do you want to do next?");
-            console.log("Type 'hoodie' for options.");
-        });
-
-        // create var log hoodie, make group writeable
-        var varloghoodie = "/var/log/hoodie";
-        mkdir("-p", varloghoodie);
-        chgrp("admin", varloghoodie);
-        chmod("g+w", varloghoodie);
-    } catch(e) {
-        console.log("hoodie setup failed: %s", e);
-        return;
-    }
-    // setup went fine
-    var config = new Config();
-    config.set("setup", true);
+    hoodie.setup();
 };
 
 
 commands["service-start"] = function service_start()
 {
     console.log("Starting Hoodie");
+    hoodie.service_start();
+
     var service = get_hoodie_service();
     service.start();
 };
@@ -83,6 +48,8 @@ commands["service-start"] = function service_start()
 commands["service-stop"] = function service_stop()
 {
     console.log("Stopping Hoodie");
+    hoodie.service_stop();
+
     var service = get_hoodie_service();
     service.stop();
 };
@@ -98,6 +65,7 @@ commands["new"] = function hoodie_new(args)
     var name = args[0];
 
     console.log("Creating new Hoodie app '" + name + "'");
+    hoodie.new_app(name);
 
     // create app
     var cmd = "git clone https://github.com/hoodiehq/hoodie-app-skeleton.git " + name;
@@ -147,12 +115,15 @@ commands["new"] = function hoodie_new(args)
 commands["delete"] = function _delete(args)
 {
     var app_name = app_name_from_args(args); // TODO: handle nonexist
+    hoodie._delete(app_name);
+
     var app = new HoodieApp(app_name);
     // bail if app runs
     if(app.is_running()) {
         console.log("App '%s' is running, can’t delete.", app_name);
         return;
     }
+
     // rm -rf path
     rm("-rf", app.get_path());
 
@@ -164,6 +135,7 @@ commands["delete"] = function _delete(args)
 commands["status"] = function status(args)
 {
     var app_name = app_name_from_args(args);
+
     var app = new HoodieApp(app_name);
     console.log("%j", app.status());
 }
@@ -204,7 +176,7 @@ commands["apps"] = function apps()
         console.log("  %s", app.path);
         console.log("");
     }
-}
+};
 
 // open an app
 commands["open"] = function open(args)
