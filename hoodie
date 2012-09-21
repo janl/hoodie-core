@@ -19,15 +19,17 @@ commands["usage"] = function usage(args)
     }
     console.log("Usage: hoodie cmd");
     console.log("cmd is one of:");
-    console.log("  setup          This needs to be run once, before everything else");
-    console.log("  new appname    Creates new Hoodie app in ./appname");
-    console.log("  start          Starts the Hoodie app in ./");
-    console.log("  start appname  Starts the Hoodie app appname");
-    console.log("  open appname   Opens an app in your browser");
-    console.log("  open           Opens the app in ./ in your browser");
-    console.log("  apps           Shows a list of all installed apps");
-    console.log("  service-start  Starts the Hoodie service");
-    console.log("  usage          Prints this screen");
+    console.log("  setup            This needs to be run once, before everything else");
+    console.log("  new appname      Creates new Hoodie app in ./appname");
+    console.log("  start            Starts the Hoodie app in ./");
+    console.log("  start appname    Starts the Hoodie app appname");
+    console.log("  open appname     Opens an app in your browser");
+    console.log("  open             Opens the app in ./ in your browser");
+    console.log("  apps             Shows a list of all installed apps");
+    console.log("  service-start    Starts the Hoodie service");
+    console.log("  service-restart  Restarts the Hoodie service");
+    console.log("  service-stop     Stops the Hoodie service");
+    console.log("  usage            Prints this screen");
 };
 
 commands["setup"] = function setup()
@@ -35,23 +37,24 @@ commands["setup"] = function setup()
     hoodie.setup();
 };
 
+// hoodie service
 
 commands["service-start"] = function service_start()
 {
     console.log("Starting Hoodie");
     hoodie.service_start();
+};
 
-    var service = get_hoodie_service();
-    service.start();
+commands["service-restart"] = function service_restart()
+{
+    console.log("Restarting Hoodie");
+    hoodie.service_restart();
 };
 
 commands["service-stop"] = function service_stop()
 {
     console.log("Stopping Hoodie");
     hoodie.service_stop();
-
-    var service = get_hoodie_service();
-    service.stop();
 };
 
 // Create a new app
@@ -66,71 +69,15 @@ commands["new"] = function hoodie_new(args)
 
     console.log("Creating new Hoodie app '" + name + "'");
     hoodie.new_app(name);
-
-    // create app
-    var cmd = "git clone https://github.com/hoodiehq/hoodie-app-skeleton.git " + name;
-    exec(cmd, function(error, stdout, stderr) {
-        if(error) {
-            throw(error);
-        }
-
-        // Customise app
-        var customisation = {
-            hoodie_appname: name,
-            hoodie_api_url: "http://api." + name + ".hoodie.dev"
-        };
-
-        var template_files = ["/www/index.html", "/package.json"];
-        template_files.forEach(function(file) {
-            file = name + file;
-            console.log("replacing values in '%s'", file);
-            for(var placeholder in customisation) {
-                var replacement = customisation[placeholder];
-                var matcher = new RegExp("{{" + placeholder + "}}", "g");
-                sed("-i", matcher, replacement, file);
-            }
-        });
-
-        try {
-            // add app config to ~/.hoodie.json
-            var config = new Config();
-            config.add_app(name, {
-                path: process.cwd() + "/" + name,
-                port: config.get_max_port() + 100 // running out of ports
-            });
-        } catch(e) {
-            // rm ./appname
-            throw(e);
-        }
-
-        // update routing proxy by touching ~/.hoodie.json
-        var newDate = new Date();
-        fs.utimesSync(process.env["HOME"] + "/.hoodie.json", newDate, newDate);
-
-        console.log("All done.");
-        console.log("Use hoodie start " + name + " to start the new app");
-    });
 };
 
 commands["delete"] = function _delete(args)
 {
-    var app_name = app_name_from_args(args); // TODO: handle nonexist
-    hoodie._delete(app_name);
+    var name = app_name_from_args(args); // TODO: handle nonexist
+    var app = new HoodieApp(name);
 
-    var app = new HoodieApp(app_name);
-    // bail if app runs
-    if(app.is_running()) {
-        console.log("App '%s' is running, can’t delete.", app_name);
-        return;
-    }
-
-    // rm -rf path
-    rm("-rf", app.get_path());
-
-    // config unset
-    var config = new Config();
-    config.delete_app(app_name);
-}
+    hoodie.delete_app(app);
+};
 
 commands["status"] = function status(args)
 {
@@ -172,8 +119,8 @@ commands["apps"] = function apps()
     for(var name in apps) {
         var app = apps[name];
         console.log("%s:", name);
-        console.log("  http://%s.hoodie.dev", name);
-        console.log("  %s", app.path);
+        console.log("  url: http://%s.hoodie.dev", name);
+        console.log("  path: %s", app.path);
         console.log("");
     }
 };
@@ -198,14 +145,6 @@ var app_name_from_args = function app_name_from_args(args)
     return app_name;
 };
 
-var get_hoodie_service = function get_hoodie_service()
-{
-    return daemon.setup({
-        main: "./bin/hoodie-service.js",
-        name: "service-start.js",
-        pidfile: "/tmp/hoodie-service.pid"
-    });
-};
 
 // main
 
