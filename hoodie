@@ -17,23 +17,27 @@ commands["usage"] = function usage(args)
     }
     console.log("Usage: hoodie cmd");
     console.log("cmd is one of:");
-    console.log("  setup            This needs to be run once, before everything else");
-    console.log("  new appname      Creates new Hoodie app in ./appname");
-
-    console.log("  start            Starts the Hoodie app in ./");
-    console.log("  start appname    Starts the Hoodie app appname");
-    console.log("  open appname     Opens an app in your browser");
-
-    console.log("  open             Opens the app in ./ in your browser");
-    console.log("  apps             Shows a list of all installed apps");
-
-    console.log("  service-start    Starts the Hoodie service");
-    console.log("  service-restart  Restarts the Hoodie service");
-    console.log("  service-stop     Stops the Hoodie service");
-
-    console.log("  worker new ");
-
-    console.log("  usage            Prints this screen");
+    console.log("  setup  This needs to be run once, before everything else");
+    console.log("");
+    console.log("  new name     Creates new Hoodie app in `./name`");
+    console.log("  delete name  Deletes app `name`");
+    console.log("  start        Starts the Hoodie app in ./");
+    console.log("  start name   Starts the Hoodie app `name`");
+    console.log("  open name    Opens app `name` in your browser");
+    console.log("  open         Opens the app in ./ in your browser");
+    console.log("");
+    console.log("  apps         Shows a list of all installed apps");
+    console.log("");
+    console.log("  service start    Starts the Hoodie service");
+    console.log("  service restart  Restarts the Hoodie service");
+    console.log("  service stop     Stops the Hoodie service");
+    console.log("");
+    console.log("  worker new name        Create new worker `name`");
+    console.log("  worker delete name     Delete worker `name`");
+    console.log("  worker show-installed  Show all installed workers");
+    console.log("  worker show-available  Show all available workers");
+    console.log("");
+    console.log("  usage  Prints this screen");
 };
 
 commands["setup"] = function setup()
