@@ -2,8 +2,6 @@
 var fs = require("fs");
 var cli = require("cli");
 var util = require("util");
-var daemon = require("daemonize2");
-var exec = require("child_process").exec;
 
 require("shelljs/global"); // GIMMEH!
 
@@ -21,14 +19,20 @@ commands["usage"] = function usage(args)
     console.log("cmd is one of:");
     console.log("  setup            This needs to be run once, before everything else");
     console.log("  new appname      Creates new Hoodie app in ./appname");
+
     console.log("  start            Starts the Hoodie app in ./");
     console.log("  start appname    Starts the Hoodie app appname");
     console.log("  open appname     Opens an app in your browser");
+
     console.log("  open             Opens the app in ./ in your browser");
     console.log("  apps             Shows a list of all installed apps");
+
     console.log("  service-start    Starts the Hoodie service");
     console.log("  service-restart  Restarts the Hoodie service");
     console.log("  service-stop     Stops the Hoodie service");
+
+    console.log("  worker new ");
+
     console.log("  usage            Prints this screen");
 };
 
@@ -126,8 +130,13 @@ commands["apps"] = function apps()
 // open an app
 commands["open"] = function open(args)
 {
-  var app_name = app_name_from_args(args);
-  exec(util.format("open http://%s.hoodie.dev", app_name));
+  var name = app_name_from_args(args);
+  var app = new HoodieApp(name);
+  if(!app.is_running()) {
+    console.log("'%s' is not runnning. Use 'hoodie start %s' to start it", name, name);
+    return;
+  }
+  exec(util.format("open http://%s.hoodie.dev", name));
 };
 
 
