@@ -141,7 +141,6 @@ commands["open"] = function open(args)
   exec(util.format("open http://%s.hoodie.dev", name));
 };
 
-
 // util
 
 var app_name_from_args = function app_name_from_args(args)
