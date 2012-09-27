@@ -13,8 +13,8 @@ Installs node, npm & CouchDB
     $ hoodie new myapp
     $ [sudo] hoodie start myapp
     Starting 'myapp'...done.
-    Visit 'myapp' at http://myapp.hoodie.local
-    $ open http://myapp.hoodie.local # browser opens
+    Visit 'myapp' at http://myapp.hoodie.dev
+    $ open http://myapp.hoodie.dev # browser opens
 
 
 ## Usage
@@ -62,9 +62,9 @@ Hoodie itself ships with a bit of library code and sub-applications itself. We�
  2. It clones an empty application skeleton from Github.
  3. It does some customisations based on your environment.
  [Ideally, 2. and 3. should be a single step, and not require net access.]
- 4. Set up the `myapp.hoodie.local` domain.
+ 4. Set up the `myapp.hoodie.dev` domain.
 
-`sudo hoodie new myapp` for the time being, `hoodie new myapp` needs to be called with `sudo`. We hope to relax that requirement in the future. We don’t do anything nefarious, promised :) — We only need root access to setup the fancy `myapp.hoodie.local` domain names on your system.
+`sudo hoodie new myapp` for the time being, `hoodie new myapp` needs to be called with `sudo`. We hope to relax that requirement in the future. We don’t do anything nefarious, promised :) — We only need root access to setup the fancy `myapp.hoodie.dev` domain names on your system.
 
 ### `hoodie start myapp`
 
@@ -81,9 +81,9 @@ Hoodie itself ships with a bit of library code and sub-applications itself. We�
 
 The services it provides are:
 
- - HTTP proxying, so that `myapp.hoodie.local` can be served over HTTP port 80.
- - DNS resolution, so `myapp.hoodie.local` can be resolved to 127.0.0.1:80.
- - A web app administration interface for all your installed hoodie applications, served on `http://hoodie.local/
+ - HTTP proxying, so that `myapp.hoodie.dev` can be served over HTTP port 80.
+ - DNS resolution, so `myapp.hoodie.dev` can be resolved to 127.0.0.1:80.
+ - A web app administration interface for all your installed hoodie applications, served on `http://hoodie.dev/
 
 #### Custom CouchDB Instance
 
