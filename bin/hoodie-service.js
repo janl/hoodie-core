@@ -55,7 +55,7 @@ function start_httpd()
     for(var app in apps) {
       routes[app + ".hoodie.dev"] = "127.0.0.1:" + apps[app].port;
       routes["api." + app + ".hoodie.dev"] = "127.0.0.1:" + (apps[app].port + 1)
-        + "/127.0.0.1:" + (apps[app].port + 2);
+        + "/127.0.0.1:" + (apps[app].port + 2) + "/";
     }
     // log(routes);
     return routes;
