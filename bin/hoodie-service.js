@@ -40,6 +40,7 @@ function start_httpd()
   function make_routes()
   {
     // {
+    //   "localhost": "127.0.0.1:80"
     //   "hoodie.dev": "127.0.0.1:1050"
     //   "api.hoodie.dev": "127.0.0.1:1051"
     //   "app.hoodie.dev": "127.0.0.1:8000",
@@ -48,6 +49,7 @@ function start_httpd()
     //   "api.foo.hoodie.dev": "127.0.0.1:8101",
     // }
     var routes = {};
+    routes["localhost"] = "127.0.0.1:80";
     routes["hoodie.dev"] = "127.0.0.1:1050";
     routes["api.hoodie.dev"] = "127.0.0.1:1051";
     var cfg = new Config();
